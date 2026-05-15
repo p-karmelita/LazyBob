@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IBM Cloud credentials (CRITICAL - never commit these)
+ibmcloud-credentials.json
+watsonx-credentials.json
+*.apikey
+*.credentials
+
+# Bob sessions (keep structure but ignore sensitive content)
+bob_sessions/*.png
+bob_sessions/*.jpg
+bob_sessions/sensitive-*
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Made with Bob
