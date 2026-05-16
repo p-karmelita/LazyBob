@@ -136,7 +136,7 @@ async function loadDashboardData() {
     showLoading(true);
     
     try {
-        // Simulate API calls - replace with actual API endpoints
+        // Load real data from API
         await Promise.all([
             loadOverviewData(),
             loadCodeAnalysisData(),
@@ -148,51 +148,31 @@ async function loadDashboardData() {
         updateDashboard();
     } catch (error) {
         console.error('Error loading dashboard data:', error);
-        showToast('Error loading data', 'error');
+        showToast('Error loading data: ' + error.message, 'error');
     } finally {
         showLoading(false);
     }
 }
 
 async function loadOverviewData() {
-    // Simulate API call
-    return new Promise(resolve => {
-        setTimeout(() => {
-            state.data.files = 156;
-            state.data.lines = 7842;
-            state.data.bobcoins.used = 4;
-            state.data.aiRequests = 127;
-            
-            state.data.activities = [
-                {
-                    icon: 'fa-code',
-                    iconColor: 'blue',
-                    title: 'Code analysis completed',
-                    time: '2 minutes ago'
-                },
-                {
-                    icon: 'fa-brain',
-                    iconColor: 'purple',
-                    title: 'AI suggestion generated',
-                    time: '15 minutes ago'
-                },
-                {
-                    icon: 'fa-check-circle',
-                    iconColor: 'green',
-                    title: 'Code review passed',
-                    time: '1 hour ago'
-                },
-                {
-                    icon: 'fa-file-alt',
-                    iconColor: 'orange',
-                    title: 'Documentation updated',
-                    time: '2 hours ago'
-                }
-            ];
-            
-            resolve();
-        }, 500);
-    });
+    try {
+        // Load stats from API
+        const stats = await api.request('/stats');
+        state.data.files = stats.files || 0;
+        state.data.lines = stats.lines || 0;
+        state.data.aiRequests = stats.functions || 0;
+        
+        // Load activity feed
+        const activities = await api.request('/activity');
+        state.data.activities = activities;
+    } catch (error) {
+        console.error('Error loading overview data:', error);
+        // Use fallback data
+        state.data.files = 0;
+        state.data.lines = 0;
+        state.data.aiRequests = 0;
+        state.data.activities = [];
+    }
 }
 
 async function loadCodeAnalysisData() {
@@ -227,12 +207,17 @@ async function loadCodeAnalysisData() {
 }
 
 async function loadBobUsageData() {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            // Bob usage data loaded
-            resolve();
-        }, 200);
-    });
+    try {
+        const usage = await api.request('/bob/usage');
+        state.data.bobcoins.used = usage.used || 0;
+        state.data.bobcoins.total = usage.total || 40;
+        state.data.bobcoins.history = usage.history || [];
+    } catch (error) {
+        console.error('Error loading Bob usage data:', error);
+        state.data.bobcoins.used = 0;
+        state.data.bobcoins.total = 40;
+        state.data.bobcoins.history = [];
+    }
 }
 
 async function loadWatsonxData() {
@@ -245,31 +230,13 @@ async function loadWatsonxData() {
 }
 
 async function loadWorkflowsData() {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            state.data.workflows = [
-                {
-                    name: 'Code Review',
-                    status: 'completed',
-                    time: '5 minutes ago',
-                    duration: '2.5 min'
-                },
-                {
-                    name: 'Documentation',
-                    status: 'running',
-                    time: 'In progress',
-                    duration: '1.2 min'
-                },
-                {
-                    name: 'Testing',
-                    status: 'completed',
-                    time: '1 hour ago',
-                    duration: '3.8 min'
-                }
-            ];
-            resolve();
-        }, 350);
-    });
+    try {
+        const workflows = await api.request('/workflows');
+        state.data.workflows = workflows || [];
+    } catch (error) {
+        console.error('Error loading workflows data:', error);
+        state.data.workflows = [];
+    }
 }
 
 // ===== Update Dashboard =====
@@ -359,14 +326,59 @@ function updateWorkflowTimeline() {
     
     timeline.innerHTML = state.data.workflows.map(workflow => `
         <div class="timeline-item">
-            <div class="timeline-marker ${workflow.status}"></div>
+            <div class="timeline-marker completed"></div>
             <div class="timeline-content">
                 <h5>${workflow.name}</h5>
-                <p>${workflow.time} • ${workflow.duration}</p>
+                <p>Runs: ${workflow.runs} • Avg: ${workflow.avgDuration}</p>
+                <button class="btn-secondary btn-sm" onclick="runWorkflow('${workflow.id}')">
+                    <i class="fas fa-play"></i> Run
+                </button>
             </div>
         </div>
     `).join('');
 }
+
+// Run specific workflow
+async function runWorkflow(workflowId) {
+    const workflow = state.data.workflows.find(w => w.id === workflowId);
+    if (!workflow) {
+        showToast('Workflow not found', 'error');
+        return;
+    }
+    
+    const params = prompt(`Enter parameters for "${workflow.name}" (JSON format or leave empty):`, '{}');
+    if (params === null) return;
+    
+    let parsedParams = {};
+    try {
+        parsedParams = params ? JSON.parse(params) : {};
+    } catch (error) {
+        showToast('Invalid JSON parameters', 'error');
+        return;
+    }
+    
+    showLoading(true);
+    showToast(`Running workflow: ${workflow.name}...`, 'info');
+    
+    try {
+        const result = await api.request(`/workflows/${workflowId}/run`, {
+            method: 'POST',
+            body: JSON.stringify({ params: parsedParams })
+        });
+        
+        showToast(`Workflow "${workflow.name}" started successfully!`, 'success');
+        await loadWorkflowsData();
+        updateWorkflowTimeline();
+    } catch (error) {
+        console.error('Workflow execution error:', error);
+        showToast('Failed to run workflow: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Make runWorkflow available globally
+window.runWorkflow = runWorkflow;
 
 // ===== Section Loading =====
 function loadSectionData(sectionId) {
@@ -431,18 +443,32 @@ function loadAboutSection() {
 
 // ===== Actions =====
 async function runCodeAnalysis() {
+    // Prompt user for path
+    const path = prompt('Enter path to analyze (e.g., ./src or leave empty for current directory):', './src');
+    
+    if (path === null) return; // User cancelled
+    
     showLoading(true);
     showToast('Running code analysis...', 'info');
     
     try {
-        // Simulate analysis
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const result = await api.request('/analyze', {
+            method: 'POST',
+            body: JSON.stringify({ path: path || '.' })
+        });
         
-        showToast('Code analysis completed', 'success');
-        await loadCodeAnalysisData();
-        updateIssuesList();
+        if (result.success) {
+            showToast('Code analysis completed successfully!', 'success');
+            // Update state with new data
+            state.data.analysisResult = result.result;
+            await loadCodeAnalysisData();
+            updateIssuesList();
+        } else {
+            showToast('Analysis completed with warnings', 'warning');
+        }
     } catch (error) {
-        showToast('Analysis failed', 'error');
+        console.error('Analysis error:', error);
+        showToast('Analysis failed: ' + error.message, 'error');
     } finally {
         showLoading(false);
     }
@@ -465,16 +491,94 @@ async function testAIFeatures() {
     }
 }
 
-function createWorkflow() {
-    showToast('Workflow creation coming soon', 'info');
+async function createWorkflow() {
+    // Prompt for workflow details
+    const name = prompt('Enter workflow name:');
+    if (!name) return;
+    
+    const description = prompt('Enter workflow description:');
+    const stepsInput = prompt('Enter workflow steps (comma-separated):', 'analyze,review,report');
+    
+    if (!stepsInput) return;
+    
+    const steps = stepsInput.split(',').map(s => s.trim());
+    
+    showLoading(true);
+    showToast('Creating workflow...', 'info');
+    
+    try {
+        const result = await api.request('/workflows', {
+            method: 'POST',
+            body: JSON.stringify({ name, description, steps })
+        });
+        
+        showToast(`Workflow "${name}" created successfully!`, 'success');
+        await loadWorkflowsData();
+        updateWorkflowTimeline();
+    } catch (error) {
+        console.error('Workflow creation error:', error);
+        showToast('Failed to create workflow: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
 }
 
-function generateReport() {
+async function generateReport() {
+    const reportType = prompt('Select report type:\n1. Performance\n2. Security\n3. Code Quality\n4. Full Report\n\nEnter number (1-4):', '4');
+    
+    if (!reportType) return;
+    
+    const types = {
+        '1': 'performance',
+        '2': 'security',
+        '3': 'quality',
+        '4': 'full'
+    };
+    
+    const type = types[reportType] || 'full';
+    
+    showLoading(true);
     showToast('Generating report...', 'info');
     
-    setTimeout(() => {
-        showToast('Report generated successfully', 'success');
-    }, 1500);
+    try {
+        // Generate report data
+        const stats = await api.request('/stats');
+        const bobUsage = await api.request('/bob/usage');
+        const workflows = await api.request('/workflows');
+        
+        // Create report content
+        const report = {
+            type,
+            timestamp: new Date().toISOString(),
+            stats,
+            bobUsage,
+            workflows,
+            summary: {
+                totalFiles: stats.files,
+                totalLines: stats.lines,
+                bobcoinsUsed: bobUsage.used,
+                workflowsRun: workflows.length
+            }
+        };
+        
+        // Download as JSON
+        const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `lazybob-report-${type}-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Report generated and downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('Report generation error:', error);
+        showToast('Failed to generate report: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
 }
 
 // ===== Helper Functions =====
