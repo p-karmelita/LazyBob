@@ -91,7 +91,26 @@ lazybob/
 3. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # Edit .env with your credentials (if using watsonx)
+   # Edit .env with your credentials
+   ```
+   
+   **Required for Bob Integration:**
+   ```bash
+   BOB_API_KEY=your_bob_api_key
+   BOB_API_URL=https://api.bob.ibm.com
+   ```
+   
+   **Optional for watsonx Integration:**
+   ```bash
+   # watsonx.ai
+   WATSONX_API_KEY=your_watsonx_api_key
+   WATSONX_PROJECT_ID=your_project_id
+   WATSONX_REGION=us-south
+   
+   # watsonx Orchestrate
+   WATSONX_ORCHESTRATE_KEY=your_orchestrate_key
+   WATSONX_ORCHESTRATE_INSTANCE=your_instance_id
+   WATSONX_ORCHESTRATE_REGION=us-south
    ```
 
 4. **Build the project**
@@ -120,6 +139,52 @@ npm run generate-docs -- <path-to-code>
 ```bash
 npm run automate -- <task-type>
 ```
+
+### watsonx AI Features (Optional)
+
+#### AI Code Suggestions
+```typescript
+import { WatsonxAIClient, GraniteModel } from './src/watsonx/ai';
+
+const client = new WatsonxAIClient({
+  apiKey: process.env.WATSONX_API_KEY!,
+  projectId: process.env.WATSONX_PROJECT_ID!,
+});
+
+const suggestion = await client.getCodeSuggestion({
+  code: 'your code here',
+  language: 'typescript',
+  context: 'Optimize for performance',
+  model: GraniteModel.CODE_20B,
+});
+```
+
+#### AI Code Review
+```typescript
+const review = await client.reviewCode({
+  code: sourceCode,
+  language: 'typescript',
+  focusAreas: ['security', 'performance', 'maintainability'],
+  model: GraniteModel.CODE_34B,
+});
+```
+
+#### Workflow Automation
+```typescript
+import { OrchestrateClient, DevWorkflowTemplate } from './src/watsonx/orchestrate';
+
+const orchestrate = new OrchestrateClient({
+  apiKey: process.env.WATSONX_ORCHESTRATE_KEY!,
+  instanceId: process.env.WATSONX_ORCHESTRATE_INSTANCE!,
+});
+
+const workflow = orchestrate.createDevWorkflow(
+  DevWorkflowTemplate.CODE_REVIEW,
+  { repository: 'my-repo', branch: 'feature/new-feature' }
+);
+```
+
+See [watsonx Integration Guide](./docs/WATSONX_INTEGRATION.md) for detailed documentation.
 
 ### Run Tests
 ```bash
@@ -187,7 +252,11 @@ Track your Bobcoin consumption:
 ## 📚 Documentation
 
 - [Project Analysis](./PROJECT_ANALYSIS.md) - Detailed project analysis and architecture
-- [API Documentation](./docs/api.md) - API reference (generated)
+- [Architecture Guide](./docs/ARCHITECTURE.md) - System architecture and design
+- [Bob API Integration](./docs/BOB_API_INTEGRATION.md) - Bob IDE integration details
+- [watsonx Integration](./docs/WATSONX_INTEGRATION.md) - AI-powered features guide
+- [API Documentation](./docs/API.md) - Complete API reference
+- [Setup Guide](./docs/SETUP_GUIDE.md) - Detailed setup instructions
 - [Examples](./examples/) - Usage examples and tutorials
 - [Bob Sessions](./bob_sessions/) - Task session reports for judging
 
@@ -200,10 +269,12 @@ Track your Bobcoin consumption:
 - ✅ README with setup instructions
 - ✅ Demo video/presentation
 
-### Optional
-- ⚡ watsonx.ai integration
-- ⚡ watsonx Orchestrate agents
-- ⚡ Advanced automation workflows
+### Optional (Completed)
+- ✅ watsonx.ai integration with IBM Granite models
+- ✅ watsonx Orchestrate workflow automation
+- ✅ AI-powered code suggestions and review
+- ✅ Autonomous AI agents for task execution
+- ✅ Advanced automation workflows
 
 ## 🔒 Security Notes
 
