@@ -706,10 +706,72 @@
     <!-- Toast Notifications -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- AI Chat Assistant -->
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div class="chat-header-content">
+                <i class="fas fa-robot"></i>
+                <div>
+                    <h4>LazyBob Assistant</h4>
+                    <span class="chat-status">Online</span>
+                </div>
+            </div>
+            <button class="chat-minimize" id="chatMinimize">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-welcome">
+                <i class="fas fa-robot"></i>
+                <h3>Hi! I'm your LazyBob Assistant 👋</h3>
+                <p>I can help you with:</p>
+                <ul>
+                    <li>Running code analysis</li>
+                    <li>Creating workflows</li>
+                    <li>Generating reports</li>
+                    <li>Understanding features</li>
+                    <li>Troubleshooting issues</li>
+                </ul>
+                <p>Just ask me anything!</p>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+        </div>
+        <div class="chat-input-container">
+            <input
+                type="text"
+                class="chat-input"
+                id="chatInput"
+                placeholder="Ask me anything about LazyBob..."
+                autocomplete="off"
+            />
+            <button class="chat-send" id="chatSend">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        <div class="chat-suggestions" id="chatSuggestions">
+            <button class="suggestion-chip" data-question="How do I analyze my code?">
+                <i class="fas fa-code"></i> Analyze code
+            </button>
+            <button class="suggestion-chip" data-question="How do I create a workflow?">
+                <i class="fas fa-project-diagram"></i> Create workflow
+            </button>
+            <button class="suggestion-chip" data-question="How do I generate a report?">
+                <i class="fas fa-file-alt"></i> Generate report
+            </button>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button class="chat-toggle" id="chatToggle">
+        <i class="fas fa-comments"></i>
+        <span class="chat-badge">AI</span>
+    </button>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/chat.js"></script>
 </body>
 </html>
