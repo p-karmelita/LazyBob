@@ -348,6 +348,9 @@ function loadSectionData(sectionId) {
         case 'reports':
             loadReportsSection();
             break;
+        case 'about':
+            loadAboutSection();
+            break;
     }
 }
 
@@ -376,6 +379,13 @@ function loadWorkflowsSection() {
 function loadReportsSection() {
     // Load reports specific data
     console.log('Loading reports section');
+}
+
+function loadAboutSection() {
+    // Load about section specific data
+    console.log('Loading about section');
+    // About section is static content, no dynamic loading needed
+    // Could add animations or dynamic content here if needed
 }
 
 // ===== Actions =====
