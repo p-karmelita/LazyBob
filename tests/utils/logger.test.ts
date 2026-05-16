@@ -65,10 +65,13 @@ describe('Logger', () => {
   describe('debug', () => {
     it('should log debug messages', () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const originalLevel = logger.getLevel();
+      logger.setLevel('debug');
       
       logger.debug('Debug message');
       
       expect(consoleSpy).toHaveBeenCalled();
+      logger.setLevel(originalLevel);
       consoleSpy.mockRestore();
     });
   });

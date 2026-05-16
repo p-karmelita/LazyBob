@@ -6,6 +6,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { dirname, join, basename, extname } from 'path';
 import { logger } from '../../utils/logger.js';
 import { AnalysisError } from '../../utils/errors.js';
+import { createProgress } from '../../utils/progress.js';
 import { createAnalyzer } from '../code-analyzer/index.js';
 import type {
   DocGenerationOptions,
@@ -39,13 +40,27 @@ export class DocGenerator {
 
     try {
       // Analyze the codebase first
+      const analyzeProgress = createProgress({
+        style: 'spinner',
+        message: 'Analyzing codebase...',
+      });
+      analyzeProgress.start();
+
       const analyzer = createAnalyzer();
       const analysis = await analyzer.analyze({
         path: opts.source,
         includeTests: false,
       });
 
+      analyzeProgress.complete('✓ Analysis complete');
+
       // Generate documentation based on format
+      const genProgress = createProgress({
+        style: 'spinner',
+        message: `Generating ${opts.format} documentation...`,
+      });
+      genProgress.start();
+
       const docs: GeneratedDoc[] = [];
 
       if (opts.format === 'markdown') {
@@ -59,10 +74,23 @@ export class DocGenerator {
         docs.push(doc);
       }
 
+      genProgress.complete('✓ Documentation generated');
+
       // Write documentation files
-      for (const doc of docs) {
+      const writeProgress = createProgress({
+        total: docs.length,
+        style: 'bar',
+        message: 'Writing files',
+      });
+      writeProgress.start();
+
+      for (let i = 0; i < docs.length; i++) {
+        const doc = docs[i];
         await this.writeDoc(doc);
+        writeProgress.update(i + 1, `Writing: ${basename(doc.path)}`);
       }
+
+      writeProgress.complete('✓ Files written');
 
       logger.info('Documentation generation completed', {
         files: docs.length,

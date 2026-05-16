@@ -5,6 +5,7 @@
 import { randomUUID } from 'crypto';
 import { logger } from '../../utils/logger.js';
 import { AnalysisError } from '../../utils/errors.js';
+import { createProgress } from '../../utils/progress.js';
 import { BobClient } from '../bob-integration/client.js';
 import { createAnalyzer } from '../code-analyzer/index.js';
 import { createDocGenerator } from '../doc-generator/index.js';
@@ -76,13 +77,21 @@ export class TaskAutomator {
       strategy: config.strategy,
     });
 
+    const taskProgress = createProgress({
+      style: 'spinner',
+      message: `Executing ${config.type} task...`,
+    });
+    taskProgress.start();
+
     try {
       // Initialize Bob client if using bob-assisted strategy
       if (config.strategy === 'bob-assisted' || config.strategy === 'hybrid') {
+        taskProgress.update(0, 'Initializing Bob client...');
         await this.initializeBobClient();
       }
 
       // Execute task based on type
+      taskProgress.update(0, `Running ${config.type}...`);
       let result: TaskResult;
       switch (config.type) {
         case 'code-review':
@@ -123,6 +132,8 @@ export class TaskAutomator {
       result.endTime = endTime;
       result.duration = endTime.getTime() - startTime.getTime();
 
+      taskProgress.complete(`✓ Task ${result.status}`);
+
       logger.info('Task execution completed', {
         taskId,
         type: config.type,
@@ -133,6 +144,9 @@ export class TaskAutomator {
       return result;
     } catch (error) {
       const endTime = new Date();
+      taskProgress.stop();
+      process.stdout.write('\n');
+      
       logger.error('Task execution failed', {
         taskId,
         type: config.type,

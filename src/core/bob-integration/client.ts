@@ -1,12 +1,12 @@
 /**
  * Bob API Client Implementation
- * 
- * This is a mock implementation for the hackathon project structure.
- * In a real implementation, this would interact with the actual Bob API.
+ *
+ * Supports both real HTTP API calls and mock mode for testing.
  */
 
 import { logger } from '../../utils/logger.js';
 import { BobAPIError, BobcoinExhaustedError } from '../../utils/errors.js';
+import { createHTTPClient, type BobHTTPClient } from './http-client.js';
 import type {
   BobClientConfig,
   BobRequest,
@@ -21,6 +21,8 @@ import type {
  */
 export class BobClient {
   private readonly config: BobClientConfig;
+  private readonly httpClient: BobHTTPClient | null;
+  private readonly useMock: boolean;
   private currentSession: BobSession | null = null;
   private bobcoinUsage: BobcoinUsage = {
     total: 40,
@@ -32,9 +34,26 @@ export class BobClient {
 
   constructor(config: BobClientConfig) {
     this.config = config;
+    
+    // Use mock mode if no endpoint provided or if explicitly set
+    this.useMock = !config.endpoint || config.endpoint === 'mock';
+    
+    // Initialize HTTP client for real API calls
+    if (!this.useMock && config.endpoint) {
+      this.httpClient = createHTTPClient({
+        apiKey: config.apiKey,
+        endpoint: config.endpoint,
+        timeout: 30000,
+        retries: 3,
+      });
+    } else {
+      this.httpClient = null;
+    }
+    
     logger.info('Bob client initialized', {
       teamId: config.teamId,
-      endpoint: config.endpoint || 'default',
+      endpoint: config.endpoint || 'mock',
+      mode: this.useMock ? 'mock' : 'real',
     });
   }
 
@@ -45,6 +64,7 @@ export class BobClient {
     logger.debug('Sending request to Bob', {
       mode: request.mode,
       promptLength: request.prompt.length,
+      useMock: this.useMock,
     });
 
     // Check Bobcoin availability
@@ -55,17 +75,36 @@ export class BobClient {
       });
     }
 
-    // Simulate API call
-    // In real implementation, this would call the actual Bob API
     try {
-      const response = await this.simulateBobRequest(request);
+      let response: BobResponse;
+      
+      // Use real HTTP client or mock
+      if (this.useMock || !this.httpClient) {
+        response = await this.simulateBobRequest(request);
+      } else {
+        response = await this.httpClient.chatCompletion(request);
+      }
       
       // Update Bobcoin usage
       this.updateBobcoinUsage(response.bobcoinsUsed);
       
+      // Track in current session if exists
+      if (this.currentSession) {
+        this.currentSession.bobcoinsUsed += response.bobcoinsUsed;
+        this.currentSession.tasks.push({
+          id: `task-${Date.now()}`,
+          description: request.prompt.substring(0, 100),
+          mode: request.mode || 'code',
+          bobcoinsUsed: response.bobcoinsUsed,
+          timestamp: new Date(),
+          status: 'completed',
+        });
+      }
+      
       logger.info('Bob request completed', {
         bobcoinsUsed: response.bobcoinsUsed,
         remaining: this.bobcoinUsage.remaining,
+        mode: this.useMock ? 'mock' : 'real',
       });
 
       return response;
@@ -178,21 +217,22 @@ export class BobClient {
   /**
    * Export session report
    */
-  async exportSession(sessionId: string, outputPath: string): Promise<void> {
+  async exportSession(outputPath: string, sessionId: string): Promise<string> {
     logger.info('Exporting session report', {
       sessionId,
       outputPath,
     });
 
     // In real implementation, this would export the actual session
-    // For now, we just log the action
+    // For now, we just log the action and return the path
     logger.debug('Session export completed (mock)');
+    return outputPath;
   }
 
   /**
    * Get rate limit information
    */
-  async getRateLimitInfo(): Promise<RateLimitInfo> {
+  getRateLimitInfo(): RateLimitInfo {
     // Mock rate limit info
     return {
       limit: 100,

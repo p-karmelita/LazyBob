@@ -7,6 +7,7 @@ import { readFile, stat } from 'fs/promises';
 import { relative, extname, basename } from 'path';
 import { logger } from '../../utils/logger.js';
 import { AnalysisError, FileAccessError } from '../../utils/errors.js';
+import { createProgress } from '../../utils/progress.js';
 import { createTypeScriptParser } from './ts-parser.js';
 import type {
   AnalysisOptions,
@@ -46,17 +47,34 @@ export class CodeAnalyzer {
 
     try {
       // Find files to analyze
+      const progress = createProgress({
+        style: 'spinner',
+        message: 'Finding files...',
+      });
+      progress.start();
+
       const files = await this.findFiles(opts);
+      progress.complete(`✓ Found ${files.length} files`);
+      
       logger.debug(`Found ${files.length} files to analyze`);
 
-      // Analyze each file
+      // Analyze each file with progress bar
+      const fileProgress = createProgress({
+        total: files.length,
+        style: 'bar',
+        message: 'Analyzing files',
+      });
+      fileProgress.start();
+
       const fileAnalyses: FileAnalysis[] = [];
       const issues: CodeIssue[] = [];
 
-      for (const file of files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         try {
           const analysis = await this.analyzeFile(file, opts);
           fileAnalyses.push(analysis);
+          fileProgress.update(i + 1, `Analyzing: ${basename(file)}`);
         } catch (error) {
           logger.warn(`Failed to analyze file: ${file}`, {
             error: error instanceof Error ? error.message : String(error),
@@ -67,14 +85,29 @@ export class CodeAnalyzer {
             file,
             line: 0,
           });
+          fileProgress.update(i + 1, `Skipped: ${basename(file)}`);
         }
       }
 
+      fileProgress.complete('✓ Analysis complete');
+
       // Build dependency graph
+      const depProgress = createProgress({
+        style: 'spinner',
+        message: 'Building dependency graph...',
+      });
+      depProgress.start();
       const dependencies = this.buildDependencyGraph(fileAnalyses);
+      depProgress.complete('✓ Dependency graph built');
 
       // Calculate metrics
+      const metricsProgress = createProgress({
+        style: 'spinner',
+        message: 'Calculating metrics...',
+      });
+      metricsProgress.start();
       const metrics = this.calculateMetrics(fileAnalyses);
+      metricsProgress.complete('✓ Metrics calculated');
 
       // Generate summary
       const summary = this.generateSummary(fileAnalyses, startTime);
@@ -478,6 +511,11 @@ export class CodeAnalyzer {
       totalLines += file.lines;
       totalFunctions += file.functions.length;
       totalClasses += file.classes.length;
+      
+      // Count methods within classes as functions
+      for (const cls of file.classes) {
+        totalFunctions += cls.methods.length;
+      }
     }
 
     return {

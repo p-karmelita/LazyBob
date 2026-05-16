@@ -14,7 +14,7 @@ describe('BobClient', () => {
     config = {
       apiKey: 'test-api-key',
       teamId: 'test-team',
-      endpoint: 'https://test.example.com',
+      endpoint: 'mock', // Use mock mode for tests
     };
     client = new BobClient(config);
   });
