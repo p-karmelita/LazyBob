@@ -2,7 +2,7 @@
 
 // API Configuration
 const API_CONFIG = {
-    baseURL: 'http://localhost:3000/api',
+    baseURL: window.location.origin + '/api',
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000
