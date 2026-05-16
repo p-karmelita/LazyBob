@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LazyBob Dashboard - AI-Powered Development Analytics</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h1>LazyBob</h1>
+            </div>
+            <p class="tagline">AI Development Analytics</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-item active" data-section="overview">
+                <i class="fas fa-home"></i>
+                <span>Overview</span>
+            </a>
+            <a href="#code-analysis" class="nav-item" data-section="code-analysis">
+                <i class="fas fa-code"></i>
+                <span>Code Analysis</span>
+            </a>
+            <a href="#bob-usage" class="nav-item" data-section="bob-usage">
+                <i class="fas fa-coins"></i>
+                <span>Bob Usage</span>
+            </a>
+            <a href="#watsonx" class="nav-item" data-section="watsonx">
+                <i class="fas fa-brain"></i>
+                <span>watsonx AI</span>
+            </a>
+            <a href="#workflows" class="nav-item" data-section="workflows">
+                <i class="fas fa-project-diagram"></i>
+                <span>Workflows</span>
+            </a>
+            <a href="#reports" class="nav-item" data-section="reports">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="status-indicator">
+                <span class="status-dot online"></span>
+                <span>System Online</span>
+            </div>
+            <p class="version">v1.0.0</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="page-title">Dashboard Overview</h2>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <button class="refresh-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="user-menu">
+                    <img src="https://ui-avatars.com/api/?name=LazyBob&background=667eea&color=fff" alt="User">
+                    <span>LazyBob Team</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Overview Section -->
+        <section id="overview" class="content-section active">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-file-code"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Total Files</h3>
+                        <p class="stat-value" id="totalFiles">0</p>
+                        <span class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 12% from last week
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Lines of Code</h3>
+                        <p class="stat-value" id="totalLines">0</p>
+                        <span class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 8% from last week
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Bobcoins Used</h3>
+                        <p class="stat-value" id="bobcoinsUsed">0</p>
+                        <span class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i> 5% from last week
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>AI Requests</h3>
+                        <p class="stat-value" id="aiRequests">0</p>
+                        <span class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 15% from last week
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Code Activity</h3>
+                        <select class="chart-filter">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 90 days</option>
+                        </select>
+                    </div>
+                    <canvas id="activityChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Language Distribution</h3>
+                        <button class="chart-action">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                    <canvas id="languageChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <div class="section-header">
+                    <h3>Recent Activity</h3>
+                    <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="activity-list" id="activityList">
+                    <!-- Activity items will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Analysis Section -->
+        <section id="code-analysis" class="content-section">
+            <div class="section-header">
+                <h3>Code Analysis Results</h3>
+                <button class="btn-primary" id="runAnalysisBtn">
+                    <i class="fas fa-play"></i> Run Analysis
+                </button>
+            </div>
+
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h4>Code Quality</h4>
+                    <div class="quality-score">
+                        <div class="score-circle" data-score="85">
+                            <svg viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="45"></circle>
+                                <circle cx="50" cy="50" r="45" class="progress"></circle>
+                            </svg>
+                            <span class="score-value">85</span>
+                        </div>
+                    </div>
+                    <div class="quality-metrics">
+                        <div class="metric">
+                            <span>Maintainability</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span>Reliability</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span>Security</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h4>Complexity Analysis</h4>
+                    <canvas id="complexityChart"></canvas>
+                </div>
+
+                <div class="analysis-card">
+                    <h4>Dependencies</h4>
+                    <div class="dependency-tree" id="dependencyTree">
+                        <!-- Dependency visualization -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="issues-section">
+                <h4>Issues & Recommendations</h4>
+                <div class="issues-list" id="issuesList">
+                    <!-- Issues will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Bob Usage Section -->
+        <section id="bob-usage" class="content-section">
+            <div class="section-header">
+                <h3>Bobcoin Usage Analytics</h3>
+                <div class="date-range-picker">
+                    <input type="date" id="startDate">
+                    <span>to</span>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+
+            <div class="usage-overview">
+                <div class="usage-card">
+                    <h4>Current Balance</h4>
+                    <div class="balance-display">
+                        <span class="balance-value" id="bobcoinBalance">40</span>
+                        <span class="balance-label">Bobcoins</span>
+                    </div>
+                    <div class="usage-bar">
+                        <div class="usage-fill" id="usageFill" style="width: 0%"></div>
+                    </div>
+                    <p class="usage-text"><span id="usedCoins">0</span> of 40 used</p>
+                </div>
+
+                <div class="usage-card">
+                    <h4>Usage by Mode</h4>
+                    <canvas id="modeUsageChart"></canvas>
+                </div>
+
+                <div class="usage-card">
+                    <h4>Daily Usage Trend</h4>
+                    <canvas id="dailyUsageChart"></canvas>
+                </div>
+            </div>
+
+            <div class="usage-history">
+                <h4>Usage History</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mode</th>
+                            <th>Request</th>
+                            <th>Coins Used</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usageHistoryTable">
+                        <!-- History rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- watsonx AI Section -->
+        <section id="watsonx" class="content-section">
+            <div class="section-header">
+                <h3>watsonx AI Analytics</h3>
+                <button class="btn-primary" id="testAIBtn">
+                    <i class="fas fa-flask"></i> Test AI
+                </button>
+            </div>
+
+            <div class="ai-stats-grid">
+                <div class="ai-stat-card">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>Code Suggestions</h4>
+                    <p class="ai-stat-value" id="suggestionsCount">0</p>
+                </div>
+                <div class="ai-stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h4>Code Reviews</h4>
+                    <p class="ai-stat-value" id="reviewsCount">0</p>
+                </div>
+                <div class="ai-stat-card">
+                    <i class="fas fa-search"></i>
+                    <h4>Analyses</h4>
+                    <p class="ai-stat-value" id="analysesCount">0</p>
+                </div>
+                <div class="ai-stat-card">
+                    <i class="fas fa-coins"></i>
+                    <h4>Tokens Used</h4>
+                    <p class="ai-stat-value" id="tokensUsed">0</p>
+                </div>
+            </div>
+
+            <div class="ai-charts-row">
+                <div class="chart-card">
+                    <h4>Model Usage</h4>
+                    <canvas id="modelUsageChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>Token Consumption</h4>
+                    <canvas id="tokenChart"></canvas>
+                </div>
+            </div>
+
+            <div class="ai-insights">
+                <h4>AI Insights</h4>
+                <div class="insights-grid" id="insightsGrid">
+                    <!-- AI insights will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Workflows Section -->
+        <section id="workflows" class="content-section">
+            <div class="section-header">
+                <h3>Workflow Automation</h3>
+                <button class="btn-primary" id="createWorkflowBtn">
+                    <i class="fas fa-plus"></i> Create Workflow
+                </button>
+            </div>
+
+            <div class="workflows-grid">
+                <div class="workflow-card">
+                    <div class="workflow-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <h4>Code Review</h4>
+                    <p>Automated code review with AI analysis</p>
+                    <div class="workflow-stats">
+                        <span><i class="fas fa-play"></i> 24 runs</span>
+                        <span><i class="fas fa-clock"></i> 2.5 min avg</span>
+                    </div>
+                    <button class="btn-secondary">Run Workflow</button>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="workflow-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h4>Documentation</h4>
+                    <p>Generate comprehensive documentation</p>
+                    <div class="workflow-stats">
+                        <span><i class="fas fa-play"></i> 18 runs</span>
+                        <span><i class="fas fa-clock"></i> 1.8 min avg</span>
+                    </div>
+                    <button class="btn-secondary">Run Workflow</button>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="workflow-icon">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <h4>Testing</h4>
+                    <p>Create and run test suites</p>
+                    <div class="workflow-stats">
+                        <span><i class="fas fa-play"></i> 32 runs</span>
+                        <span><i class="fas fa-clock"></i> 3.2 min avg</span>
+                    </div>
+                    <button class="btn-secondary">Run Workflow</button>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="workflow-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>Deployment</h4>
+                    <p>Automated deployment pipeline</p>
+                    <div class="workflow-stats">
+                        <span><i class="fas fa-play"></i> 15 runs</span>
+                        <span><i class="fas fa-clock"></i> 5.1 min avg</span>
+                    </div>
+                    <button class="btn-secondary">Run Workflow</button>
+                </div>
+            </div>
+
+            <div class="workflow-history">
+                <h4>Recent Workflow Executions</h4>
+                <div class="timeline" id="workflowTimeline">
+                    <!-- Timeline items will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="content-section">
+            <div class="section-header">
+                <h3>Reports & Analytics</h3>
+                <button class="btn-primary" id="generateReportBtn">
+                    <i class="fas fa-file-pdf"></i> Generate Report
+                </button>
+            </div>
+
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Performance Report</h4>
+                    </div>
+                    <p>Comprehensive performance analysis</p>
+                    <div class="report-meta">
+                        <span><i class="fas fa-calendar"></i> Last updated: Today</span>
+                        <span><i class="fas fa-download"></i> 234 downloads</span>
+                    </div>
+                    <button class="btn-secondary">View Report</button>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Security Audit</h4>
+                    </div>
+                    <p>Security vulnerabilities and recommendations</p>
+                    <div class="report-meta">
+                        <span><i class="fas fa-calendar"></i> Last updated: Yesterday</span>
+                        <span><i class="fas fa-download"></i> 156 downloads</span>
+                    </div>
+                    <button class="btn-secondary">View Report</button>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-header">
+                        <i class="fas fa-code"></i>
+                        <h4>Code Quality</h4>
+                    </div>
+                    <p>Code quality metrics and trends</p>
+                    <div class="report-meta">
+                        <span><i class="fas fa-calendar"></i> Last updated: 2 days ago</span>
+                        <span><i class="fas fa-download"></i> 189 downloads</span>
+                    </div>
+                    <button class="btn-secondary">View Report</button>
+                </div>
+            </div>
+
+            <div class="export-section">
+                <h4>Export Data</h4>
+                <div class="export-options">
+                    <button class="export-btn">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                    <button class="export-btn">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                    <button class="export-btn">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                    <button class="export-btn">
+                        <i class="fas fa-file-code"></i> Export JSON
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Loading data...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/api.js"></script>
+</body>
+</html>

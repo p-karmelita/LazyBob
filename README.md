@@ -32,6 +32,22 @@ LazyBob is a comprehensive development accelerator built for the IBM Bob Hackath
 - Suggest fixes
 - Improve code quality
 
+### 5. **AI-Powered Features (watsonx Integration)**
+- AI code suggestions using IBM Granite models
+- Automated code review with quality scoring
+- Comprehensive code analysis (security, performance, maintainability)
+- Workflow automation with watsonx Orchestrate
+- AI agents for autonomous task execution
+
+### 6. **Interactive Web Dashboard** 🆕
+- Real-time analytics and monitoring
+- Interactive charts and graphs (Chart.js)
+- Code quality visualization
+- Bobcoin usage tracking
+- watsonx AI statistics
+- Workflow execution timeline
+- Responsive design for all devices
+
 ## 🏗️ Project Structure
 
 ```
@@ -56,6 +72,13 @@ lazybob/
 │   ├── onboarding/                # Onboarding examples
 │   ├── documentation/             # Documentation examples
 │   └── automation/                # Automation examples
+├── dashboard/                     # Interactive web dashboard
+│   ├── index.html                 # Main dashboard page
+│   ├── css/styles.css             # Dashboard styling
+│   └── js/                        # Dashboard JavaScript
+│       ├── dashboard.js           # Main dashboard logic
+│       ├── charts.js              # Chart.js configurations
+│       └── api.js                 # API integration
 ├── tests/                         # Test suites
 ├── docs/                          # Project documentation
 ├── bob_sessions/                  # Bob task session reports (for judging)
@@ -320,3 +343,27 @@ For hackathon-specific questions:
 ---
 
 **Built with ❤️ using IBM Bob IDE**
+### Web Dashboard
+
+Launch the interactive dashboard:
+
+```bash
+# Using Python
+cd dashboard
+python3 -m http.server 8080
+
+# Or using Node.js
+npx http-server dashboard -p 8080
+
+# Then open http://localhost:8080 in your browser
+```
+
+The dashboard provides:
+- Real-time analytics and monitoring
+- Interactive charts (activity, languages, complexity)
+- Bobcoin usage tracking
+- watsonx AI statistics
+- Workflow execution timeline
+- Code quality visualization
+
+See [dashboard/README.md](dashboard/README.md) for detailed documentation.
