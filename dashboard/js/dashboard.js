@@ -35,19 +35,47 @@ function initializeNavigation() {
             e.preventDefault();
             const sectionId = item.dataset.section;
             
-            // Update active states
+            // Don't do anything if already active
+            if (item.classList.contains('active')) return;
+            
+            // Find current active section
+            const currentSection = document.querySelector('.content-section.active');
+            
+            // Add fade-out animation to current section
+            if (currentSection) {
+                currentSection.classList.add('fade-out');
+                
+                // Wait for fade-out animation to complete
+                setTimeout(() => {
+                    currentSection.classList.remove('active', 'fade-out');
+                    
+                    // Show new section with fade-in
+                    const newSection = document.getElementById(sectionId);
+                    newSection.classList.add('active');
+                }, 300);
+            } else {
+                // No current section, just show the new one
+                document.getElementById(sectionId).classList.add('active');
+            }
+            
+            // Update active states for navigation
             navItems.forEach(nav => nav.classList.remove('active'));
-            sections.forEach(section => section.classList.remove('active'));
-            
             item.classList.add('active');
-            document.getElementById(sectionId).classList.add('active');
             
-            // Update page title
+            // Update page title with smooth transition
             const title = item.querySelector('span').textContent;
-            document.querySelector('.page-title').textContent = title;
+            const pageTitle = document.querySelector('.page-title');
+            pageTitle.style.opacity = '0';
+            setTimeout(() => {
+                pageTitle.textContent = title;
+                pageTitle.style.opacity = '1';
+            }, 150);
             
             state.currentSection = sectionId;
             loadSectionData(sectionId);
+            
+            // Close mobile menu if open
+            closeMobileMenu();
         });
     });
 }
@@ -60,6 +88,19 @@ function initializeEventListeners() {
     
     menuToggle?.addEventListener('click', () => {
         sidebar.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+        
+        // Add overlay when menu is open
+        toggleOverlay();
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (sidebar && sidebar.classList.contains('active')) {
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                closeMobileMenu();
+            }
+        }
     });
     
     // Refresh button
@@ -544,6 +585,59 @@ window.addEventListener('beforeunload', () => {
     if (state.refreshInterval) {
         clearInterval(state.refreshInterval);
     }
+
+// ===== Mobile Menu Functions =====
+function closeMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const menuToggle = document.getElementById('menuToggle');
+    
+    if (sidebar && sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        menuToggle?.classList.remove('active');
+        removeOverlay();
+    }
+}
+
+function toggleOverlay() {
+    let overlay = document.getElementById('mobileOverlay');
+    
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'mobileOverlay';
+        overlay.className = 'mobile-overlay';
+        overlay.addEventListener('click', closeMobileMenu);
+        document.body.appendChild(overlay);
+    }
+    
+    // Toggle visibility
+    setTimeout(() => {
+        overlay.classList.toggle('active');
+    }, 10);
+}
+
+function removeOverlay() {
+    const overlay = document.getElementById('mobileOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.remove();
+        }, 300);
+    }
+}
+
+// ===== Page Title Transition =====
+function updatePageTitle(title) {
+    const pageTitle = document.querySelector('.page-title');
+    if (!pageTitle) return;
+    
+    pageTitle.style.transition = 'opacity 0.3s ease';
+    pageTitle.style.opacity = '0';
+    
+    setTimeout(() => {
+        pageTitle.textContent = title;
+        pageTitle.style.opacity = '1';
+    }, 150);
+}
 });
 
 // ===== Export for use in other modules =====
@@ -551,7 +645,9 @@ window.DashboardApp = {
     state,
     loadDashboardData,
     showToast,
-    showLoading
+    showLoading,
+    closeMobileMenu,
+    updatePageTitle
 };
 
 // Made with Bob
