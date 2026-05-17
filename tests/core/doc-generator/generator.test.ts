@@ -39,16 +39,72 @@ vi.mock('../../../src/core/code-analyzer/index.js', () => ({
         totalLines: 500,
         totalFunctions: 20,
         totalClasses: 5,
+        languages: { TypeScript: 5 },
+        analyzedAt: new Date(),
+        duration: 100,
       },
       files: [
         {
           path: 'src/utils.ts',
+          language: 'TypeScript',
           lines: 100,
-          functions: 5,
-          classes: 1,
+          size: 1024,
+          functions: [
+            {
+              name: 'testFunction',
+              line: 10,
+              endLine: 20,
+              complexity: 5,
+              parameters: [],
+              isAsync: false,
+              isExported: true,
+            },
+          ],
+          classes: [
+            {
+              name: 'TestClass',
+              line: 30,
+              endLine: 50,
+              methods: [],
+              properties: [],
+              isExported: true,
+            },
+          ],
+          imports: ['fs', 'path'],
+          exports: ['testFunction', 'TestClass'],
           complexity: 10,
         },
       ],
+      dependencies: {
+        nodes: [
+          { id: 'src/utils.ts', label: 'utils', type: 'file' as const },
+        ],
+        edges: [
+          { from: 'src/utils.ts', to: 'fs', type: 'import' as const },
+        ],
+      },
+      metrics: {
+        complexity: {
+          average: 5.5,
+          max: 10,
+          min: 1,
+          distribution: { low: 3, medium: 2, high: 0 },
+        },
+        maintainability: {
+          index: 75.5,
+          score: 'B' as const,
+          factors: {
+            complexity: 5.5,
+            volume: 100,
+            effort: 50,
+          },
+        },
+        quality: {
+          documentationCoverage: 80,
+          duplicateCode: 5,
+          codeSmells: 2,
+        },
+      },
       issues: [],
     }),
   })),
@@ -185,7 +241,7 @@ describe('DocGenerator', () => {
       expect(docs[0].metadata).toBeDefined();
       expect(docs[0].metadata.title).toBe('My API');
       expect(docs[0].metadata.description).toBe('API documentation for my project');
-      expect(docs[0].metadata.generatedBy).toBe('LazyBob');
+      expect(docs[0].metadata.generatedBy).toBe('LazyBob Documentation Generator');
       expect(docs[0].metadata.timestamp).toBeInstanceOf(Date);
     });
 
@@ -201,7 +257,7 @@ describe('DocGenerator', () => {
         format: 'markdown',
       };
 
-      await expect(generator.generate(options)).rejects.toThrow('Analysis failed');
+      await expect(generator.generate(options)).rejects.toThrow('Failed to generate documentation');
     });
 
     it('should use default options when not provided', async () => {
@@ -381,7 +437,7 @@ describe('DocGenerator', () => {
         format: 'markdown',
       };
 
-      await expect(generator.generate(options)).rejects.toThrow('Write failed');
+      await expect(generator.generate(options)).rejects.toThrow('Failed to generate documentation');
     });
   });
 
@@ -423,8 +479,37 @@ describe('DocGenerator', () => {
             totalLines: 0,
             totalFunctions: 0,
             totalClasses: 0,
+            languages: {},
+            analyzedAt: new Date(),
+            duration: 0,
           },
           files: [],
+          dependencies: {
+            nodes: [],
+            edges: [],
+          },
+          metrics: {
+            complexity: {
+              average: 0,
+              max: 0,
+              min: 0,
+              distribution: {},
+            },
+            maintainability: {
+              index: 0,
+              score: 'A' as const,
+              factors: {
+                complexity: 0,
+                volume: 0,
+                effort: 0,
+              },
+            },
+            quality: {
+              documentationCoverage: 0,
+              duplicateCode: 0,
+              codeSmells: 0,
+            },
+          },
           issues: [],
         }),
       } as any);

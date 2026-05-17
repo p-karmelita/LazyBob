@@ -464,7 +464,19 @@ export class DocGenerator {
       }
     }
 
-    const content = JSON.stringify(apiDoc, null, 2);
+    // Create complete JSON structure with metadata and summary
+    const jsonDoc = {
+      metadata: {
+        title: options.title || 'API Documentation',
+        description: options.description,
+        generatedBy: 'LazyBob Documentation Generator',
+        timestamp: new Date(),
+      },
+      summary: analysis.summary,
+      ...apiDoc,
+    };
+
+    const content = JSON.stringify(jsonDoc, null, 2);
 
     return {
       path: join(options.output, 'api.json'),

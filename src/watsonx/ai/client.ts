@@ -213,6 +213,21 @@ Provide specific issues with line numbers, severity levels, and suggestions for 
   ): CodeSuggestionResponse {
     const generatedText = response.results[0]?.generated_text || '';
     
+    // Try to parse as JSON first (for structured responses)
+    try {
+      const parsed = JSON.parse(generatedText);
+      if (parsed.suggestion !== undefined) {
+        return {
+          suggestion: parsed.suggestion || '',
+          confidence: parsed.confidence || 0.85,
+          reasoning: parsed.reasoning || '',
+          improvements: parsed.improvements || [],
+        };
+      }
+    } catch {
+      // Not JSON, continue with text parsing
+    }
+    
     // Extract suggestion and reasoning from the response
     const lines = generatedText.split('\n');
     const suggestion = lines.slice(0, -2).join('\n').trim();
@@ -231,6 +246,21 @@ Provide specific issues with line numbers, severity levels, and suggestions for 
    */
   private parseCodeReview(response: GenerationResponse): CodeReviewResponse {
     const generatedText = response.results[0]?.generated_text || '';
+    
+    // Try to parse as JSON first (for structured responses)
+    try {
+      const parsed = JSON.parse(generatedText);
+      if (parsed.issues && typeof parsed.overallScore === 'number') {
+        return {
+          issues: parsed.issues,
+          overallScore: parsed.overallScore,
+          summary: parsed.summary || this.extractSummary(generatedText),
+          recommendations: parsed.recommendations || this.extractRecommendations(generatedText),
+        };
+      }
+    } catch {
+      // Not JSON, continue with text parsing
+    }
     
     // Parse the review text to extract structured information
     const issues = this.extractIssues(generatedText);

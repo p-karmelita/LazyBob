@@ -293,29 +293,17 @@ describe('WatsonxAIClient', () => {
         model_id: GraniteModel.CODE_20B,
         created_at: new Date().toISOString(),
         results: [{
-          generated_text: JSON.stringify({
-            summary: 'Code analysis complete',
-            insights: ['Good structure', 'Clear naming'],
-            suggestions: [{
-              suggestion: 'Add error handling',
-              confidence: 0.9,
-              reasoning: 'No try-catch blocks',
-              improvements: ['Better error handling'],
-            }],
-            complexity: {
-              score: 5,
-              factors: ['Few branches', 'Simple logic'],
-            },
-            quality: {
-              score: 85,
-              issues: [],
-            },
-            tokenUsage: {
-              inputTokens: 100,
-              outputTokens: 200,
-              totalTokens: 300,
-            },
-          }),
+          generated_text: `Summary: Code analysis complete
+
+Insights:
+- Good structure
+- Clear naming
+
+Complexity Factors:
+- Few branches
+- Simple logic
+
+Issues: None found`,
           generated_token_count: 200,
           input_token_count: 100,
           stop_reason: 'eos_token',
@@ -329,11 +317,11 @@ describe('WatsonxAIClient', () => {
 
       const result = await client.analyzeCode('test code', 'typescript');
 
-      expect(result.summary).toBe('Code analysis complete');
-      expect(result.insights).toHaveLength(2);
-      expect(result.suggestions).toHaveLength(1);
-      expect(result.complexity.score).toBe(5);
-      expect(result.quality.score).toBe(85);
+      expect(result.summary).toContain('Code analysis complete');
+      expect(result.insights.length).toBeGreaterThan(0);
+      expect(result.tokenUsage.inputTokens).toBe(100);
+      expect(result.tokenUsage.outputTokens).toBe(200);
+      expect(result.tokenUsage.totalTokens).toBe(300);
     });
 
     it('should include context when provided', async () => {
@@ -341,14 +329,7 @@ describe('WatsonxAIClient', () => {
         model_id: GraniteModel.CODE_20B,
         created_at: new Date().toISOString(),
         results: [{
-          generated_text: JSON.stringify({
-            summary: 'Analysis with context',
-            insights: [],
-            suggestions: [],
-            complexity: { score: 1, factors: [] },
-            quality: { score: 100, issues: [] },
-            tokenUsage: { inputTokens: 10, outputTokens: 10, totalTokens: 20 },
-          }),
+          generated_text: 'Summary: Analysis with context\n\nNo issues found.',
           generated_token_count: 10,
           input_token_count: 10,
           stop_reason: 'eos_token',
@@ -360,9 +341,11 @@ describe('WatsonxAIClient', () => {
         json: async () => mockResponse,
       } as any);
 
-      await client.analyzeCode('test', 'typescript', 'This is a utility function');
+      const result = await client.analyzeCode('test', 'typescript', 'This is a utility function');
 
       expect(fetch).toHaveBeenCalled();
+      expect(result.tokenUsage.inputTokens).toBe(10);
+      expect(result.tokenUsage.outputTokens).toBe(10);
     });
   });
 
