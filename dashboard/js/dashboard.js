@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeNavigation();
     initializeEventListeners();
     loadDashboardData();
-    startAutoRefresh();
+    // Auto-refresh disabled for mock data dashboard
+    // startAutoRefresh();
     showToast('Dashboard loaded successfully', 'success');
 });
 
@@ -443,29 +444,53 @@ function loadAboutSection() {
 
 // ===== Actions =====
 async function runCodeAnalysis() {
-    // Prompt user for path
-    const path = prompt('Enter path to analyze (e.g., ./src or leave empty for current directory):', './src');
-    
-    if (path === null) return; // User cancelled
-    
     showLoading(true);
     showToast('Running code analysis...', 'info');
     
     try {
-        const result = await api.request('/analyze', {
-            method: 'POST',
-            body: JSON.stringify({ path: path || '.' })
-        });
+        // Simulate analysis with mock data (no backend required)
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        if (result.success) {
-            showToast('Code analysis completed successfully!', 'success');
-            // Update state with new data
-            state.data.analysisResult = result.result;
-            await loadCodeAnalysisData();
-            updateIssuesList();
-        } else {
-            showToast('Analysis completed with warnings', 'warning');
-        }
+        // Generate random analysis results
+        const randomIssues = [
+            {
+                severity: 'high',
+                type: 'Security',
+                message: 'Potential SQL injection vulnerability detected',
+                file: 'src/database/query.ts',
+                line: Math.floor(Math.random() * 100) + 1
+            },
+            {
+                severity: 'medium',
+                type: 'Performance',
+                message: 'Inefficient loop detected - consider using map/filter',
+                file: 'src/utils/processor.ts',
+                line: Math.floor(Math.random() * 200) + 1
+            },
+            {
+                severity: 'low',
+                type: 'Code Style',
+                message: 'Missing JSDoc comment for public function',
+                file: 'src/core/analyzer.ts',
+                line: Math.floor(Math.random() * 150) + 1
+            },
+            {
+                severity: 'medium',
+                type: 'Best Practice',
+                message: 'Consider using async/await instead of callbacks',
+                file: 'src/api/client.ts',
+                line: Math.floor(Math.random() * 180) + 1
+            }
+        ];
+        
+        // Update state with new mock data
+        state.data.issues = randomIssues;
+        state.data.files = Math.floor(Math.random() * 50) + 150;
+        state.data.lines = Math.floor(Math.random() * 2000) + 7000;
+        
+        showToast('Code analysis completed successfully!', 'success');
+        updateIssuesList();
+        updateStats();
     } catch (error) {
         console.error('Analysis error:', error);
         showToast('Analysis failed: ' + error.message, 'error');
@@ -507,10 +532,21 @@ async function createWorkflow() {
     showToast('Creating workflow...', 'info');
     
     try {
-        const result = await api.request('/workflows', {
-            method: 'POST',
-            body: JSON.stringify({ name, description, steps })
-        });
+        // Simulate workflow creation with mock data
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Add workflow to mock data
+        const newWorkflow = {
+            id: Date.now(),
+            name,
+            description: description || 'Custom workflow',
+            steps,
+            status: 'active',
+            created: new Date().toISOString()
+        };
+        
+        // Update state
+        state.workflows.push(newWorkflow);
         
         showToast(`Workflow "${name}" created successfully!`, 'success');
         await loadWorkflowsData();
@@ -541,23 +577,34 @@ async function generateReport() {
     showToast('Generating report...', 'info');
     
     try {
-        // Generate report data
-        const stats = await api.request('/stats');
-        const bobUsage = await api.request('/bob/usage');
-        const workflows = await api.request('/workflows');
+        // Simulate report generation with mock data
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Create report content
+        // Use current state data for report
         const report = {
             type,
             timestamp: new Date().toISOString(),
-            stats,
-            bobUsage,
-            workflows,
+            stats: {
+                files: state.stats.files,
+                lines: state.stats.lines,
+                functions: state.stats.functions,
+                classes: state.stats.classes,
+                issues: state.stats.issues
+            },
+            bobUsage: {
+                used: state.bobUsage.used,
+                remaining: state.bobUsage.remaining,
+                total: state.bobUsage.total
+            },
+            workflows: state.workflows,
+            analysis: state.analysis,
             summary: {
-                totalFiles: stats.files,
-                totalLines: stats.lines,
-                bobcoinsUsed: bobUsage.used,
-                workflowsRun: workflows.length
+                totalFiles: state.stats.files,
+                totalLines: state.stats.lines,
+                bobcoinsUsed: state.bobUsage.used,
+                workflowsRun: state.workflows.length,
+                issuesFound: state.stats.issues,
+                reportType: type
             }
         };
         
