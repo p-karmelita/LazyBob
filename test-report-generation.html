@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Report Generation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>LazyBob Report Generation Test</h1>
+    <p>Click the button below to test report generation:</p>
+    
+    <button onclick="testReportGeneration('performance')">Generate Performance Report</button>
+    <button onclick="testReportGeneration('security')">Generate Security Report</button>
+    <button onclick="testReportGeneration('quality')">Generate Quality Report</button>
+    <button onclick="testReportGeneration('full')">Generate Full Report</button>
+    
+    <div id="output"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        async function testReportGeneration(type) {
+            const output = document.getElementById('output');
+            output.innerHTML = `Testing ${type} report generation...\n`;
+            
+            try {
+                const response = await fetch(`${API_BASE}/reports/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: type,
+                        options: {
+                            includeCharts: true,
+                            includeHistory: true
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success && data.report) {
+                    output.innerHTML += `<span class="success">✓ Report generated successfully!</span>\n\n`;
+                    output.innerHTML += `Report Details:\n`;
+                    output.innerHTML += `- Type: ${data.report.type}\n`;
+                    output.innerHTML += `- Timestamp: ${data.report.timestamp}\n`;
+                    output.innerHTML += `- Files: ${data.report.stats.files}\n`;
+                    output.innerHTML += `- Lines: ${data.report.stats.lines}\n`;
+                    output.innerHTML += `- Bobcoins Used: ${data.report.bobUsage.used}/${data.report.bobUsage.total}\n`;
+                    output.innerHTML += `\nFull Report:\n${JSON.stringify(data.report, null, 2)}`;
+                    
+                    // Download the report
+                    const blob = new Blob([JSON.stringify(data.report, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `lazybob-report-${type}-${Date.now()}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    output.innerHTML += `\n<span class="success">✓ Report downloaded!</span>`;
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+            } catch (error) {
+                output.innerHTML += `<span class="error">✗ Error: ${error.message}</span>\n`;
+                console.error('Report generation error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

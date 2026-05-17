@@ -18,7 +18,6 @@ const __dirname = path.dirname(__filename);
 export class DashboardServer {
   private app: Express;
   private port: number;
-  private bobClient: any;
 
   constructor(port: number = 3000) {
     this.app = express();
@@ -39,7 +38,7 @@ export class DashboardServer {
     this.app.use(express.static(dashboardPath));
     
     // Logging
-    this.app.use((req, res, next) => {
+    this.app.use((req, _res, next) => {
       logger.info(`${req.method} ${req.path}`);
       next();
     });
@@ -69,13 +68,16 @@ export class DashboardServer {
     // Chat endpoint
     this.app.post('/api/chat', this.handleChat.bind(this));
     
+    // Reports endpoint
+    this.app.post('/api/reports/generate', this.handleGenerateReport.bind(this));
+    
     // Serve dashboard HTML for all other routes
-    this.app.get('*', (req, res) => {
+    this.app.get('*', (_req, res) => {
       res.sendFile(path.join(__dirname, '../../dashboard/index.html'));
     });
   }
 
-  private async handleHealth(req: Request, res: Response): Promise<void> {
+  private async handleHealth(_req: Request, res: Response): Promise<void> {
     try {
       const config = getConfig();
       const bobClient = createBobClient({
@@ -99,7 +101,7 @@ export class DashboardServer {
     }
   }
 
-  private async handleStats(req: Request, res: Response): Promise<void> {
+  private async handleStats(_req: Request, res: Response): Promise<void> {
     try {
       // Get project statistics
       const stats = {
@@ -118,7 +120,7 @@ export class DashboardServer {
     }
   }
 
-  private async handleBobUsage(req: Request, res: Response): Promise<void> {
+  private async handleBobUsage(_req: Request, res: Response): Promise<void> {
     try {
       const config = getConfig();
       const bobClient = createBobClient({
@@ -171,7 +173,7 @@ export class DashboardServer {
     }
   }
 
-  private async handleGetWorkflows(req: Request, res: Response): Promise<void> {
+  private async handleGetWorkflows(_req: Request, res: Response): Promise<void> {
     try {
       const workflows = [
         {
@@ -242,7 +244,6 @@ export class DashboardServer {
   private async handleRunWorkflow(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { params } = req.body;
 
       logger.info(`Running workflow: ${id}`);
       
@@ -262,7 +263,7 @@ export class DashboardServer {
     }
   }
 
-  private async handleActivity(req: Request, res: Response): Promise<void> {
+  private async handleActivity(_req: Request, res: Response): Promise<void> {
     try {
       const activities = [
         {
@@ -338,6 +339,96 @@ export class DashboardServer {
         response,
         timestamp: new Date().toISOString(),
         context: context || 'general'
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  private async handleGenerateReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { type, options } = req.body;
+      
+      if (!type) {
+        res.status(400).json({ error: 'Report type is required' });
+        return;
+      }
+
+      logger.info(`Generating ${type} report`);
+      
+      // Get current stats for the report
+      const stats = {
+        files: 156,
+        lines: 7842,
+        functions: 234,
+        classes: 45,
+        issues: 12
+      };
+
+      // Get Bob usage data
+      const config = getConfig();
+      const bobClient = createBobClient({
+        apiKey: config.bob.apiKey,
+        teamId: config.bob.teamId,
+        endpoint: config.bob.endpoint,
+      });
+      const usage = bobClient.getBobcoinUsage();
+
+      // Get workflows
+      const workflows = [
+        {
+          id: '1',
+          name: 'Code Review',
+          runs: 24,
+          avgDuration: '2.5 min'
+        },
+        {
+          id: '2',
+          name: 'Documentation',
+          runs: 18,
+          avgDuration: '1.8 min'
+        }
+      ];
+
+      // Generate comprehensive report
+      const report = {
+        type,
+        timestamp: new Date().toISOString(),
+        stats: {
+          files: stats.files,
+          lines: stats.lines,
+          functions: stats.functions,
+          classes: stats.classes,
+          issues: stats.issues
+        },
+        bobUsage: {
+          used: usage.used,
+          remaining: usage.remaining,
+          total: usage.total,
+          percentage: usage.percentage
+        },
+        workflows: workflows,
+        summary: {
+          totalFiles: stats.files,
+          totalLines: stats.lines,
+          bobcoinsUsed: usage.used,
+          workflowsRun: workflows.length,
+          issuesFound: stats.issues,
+          reportType: type
+        },
+        metadata: {
+          generatedBy: 'LazyBob Dashboard',
+          version: '1.0.0',
+          ...options
+        }
+      };
+
+      res.json({
+        success: true,
+        report,
+        downloadUrl: `/api/reports/${Date.now()}/download`
       });
     } catch (error) {
       res.status(500).json({

@@ -11,18 +11,18 @@
 
 ## Overview
 
-This documentation covers 25 files with 5,143 lines of code.
+This documentation covers 34 files with 7,631 lines of code.
 
 ### Statistics
 
-- **Total Files**: 25
-- **Total Lines**: 5,143
-- **Total Functions**: 25
-- **Total Classes**: 21
+- **Total Files**: 34
+- **Total Lines**: 7,631
+- **Total Functions**: 173
+- **Total Classes**: 26
 
 ### Languages
 
-- **TypeScript**: 25 files
+- **TypeScript**: 34 files
 
 ## Modules
 
@@ -39,6 +39,20 @@ This documentation covers 25 files with 5,143 lines of code.
 - `./utils/logger.js`
 - `./utils/config.js`
 - `./core/bob-integration/index.js`
+
+### `utils/progress.ts`
+
+**Language**: TypeScript  
+**Lines**: 281  
+**Complexity**: 33
+
+**Exports**:
+- `createProgress`
+- `withProgress`
+- `ProgressIndicator`
+
+**Imports**:
+- `chalk`
 
 ### `utils/logger.ts`
 
@@ -58,7 +72,7 @@ This documentation covers 25 files with 5,143 lines of code.
 ### `utils/index.ts`
 
 **Language**: TypeScript  
-**Lines**: 10  
+**Lines**: 11  
 **Complexity**: 2
 
 ### `utils/errors.ts`
@@ -120,6 +134,23 @@ This documentation covers 25 files with 5,143 lines of code.
 **Imports**:
 - `zod`
 
+### `server/index.ts`
+
+**Language**: TypeScript  
+**Lines**: 460  
+**Complexity**: 24
+
+**Exports**:
+- `DashboardServer`
+
+**Imports**:
+- `express`
+- `cors`
+- `path`
+- `url`
+- `../utils/logger.js`
+- ... and 3 more
+
 ### `cli/index.ts`
 
 **Language**: TypeScript  
@@ -133,6 +164,68 @@ This documentation covers 25 files with 5,143 lines of code.
 - `../core/doc-generator/cli.js`
 - `../core/task-automator/cli.js`
 - ... and 1 more
+
+### `watsonx/orchestrate/types.ts`
+
+**Language**: TypeScript  
+**Lines**: 162  
+**Complexity**: 2
+
+### `watsonx/orchestrate/index.ts`
+
+**Language**: TypeScript  
+**Lines**: 10  
+**Complexity**: 1
+
+**Exports**:
+- `OrchestrateClient`
+- `createOrchestrateClient`
+
+### `watsonx/orchestrate/client.ts`
+
+**Language**: TypeScript  
+**Lines**: 516  
+**Complexity**: 15
+
+**Exports**:
+- `createOrchestrateClient`
+- `OrchestrateClient`
+
+**Imports**:
+- `../../utils/logger.js`
+- `../../utils/errors.js`
+- `./types.js`
+
+### `watsonx/ai/types.ts`
+
+**Language**: TypeScript  
+**Lines**: 153  
+**Complexity**: 3
+
+### `watsonx/ai/index.ts`
+
+**Language**: TypeScript  
+**Lines**: 10  
+**Complexity**: 1
+
+**Exports**:
+- `WatsonxAIClient`
+- `createWatsonxAIClient`
+
+### `watsonx/ai/client.ts`
+
+**Language**: TypeScript  
+**Lines**: 478  
+**Complexity**: 40
+
+**Exports**:
+- `createWatsonxAIClient`
+- `WatsonxAIClient`
+
+**Imports**:
+- `../../utils/logger.js`
+- `../../utils/errors.js`
+- `./types.js`
 
 ### `core/task-automator/types.ts`
 
@@ -201,7 +294,7 @@ This documentation covers 25 files with 5,143 lines of code.
 ### `core/task-automator/automator.ts`
 
 **Language**: TypeScript  
-**Lines**: 805  
+**Lines**: 819  
 **Complexity**: 80
 
 **Exports**:
@@ -212,9 +305,9 @@ This documentation covers 25 files with 5,143 lines of code.
 - `crypto`
 - `../../utils/logger.js`
 - `../../utils/errors.js`
+- `../../utils/progress.js`
 - `../bob-integration/client.js`
-- `../code-analyzer/index.js`
-- ... and 3 more
+- ... and 4 more
 
 ### `core/doc-generator/types.ts`
 
@@ -252,7 +345,7 @@ This documentation covers 25 files with 5,143 lines of code.
 ### `core/doc-generator/generator.ts`
 
 **Language**: TypeScript  
-**Lines**: 572  
+**Lines**: 612  
 **Complexity**: 40
 
 **Exports**:
@@ -264,8 +357,8 @@ This documentation covers 25 files with 5,143 lines of code.
 - `path`
 - `../../utils/logger.js`
 - `../../utils/errors.js`
-- `../code-analyzer/index.js`
-- ... and 2 more
+- `../../utils/progress.js`
+- ... and 3 more
 
 ### `core/doc-generator/cli.ts`
 
@@ -315,8 +408,15 @@ This documentation covers 25 files with 5,143 lines of code.
 ### `core/code-analyzer/index.ts`
 
 **Language**: TypeScript  
-**Lines**: 11  
+**Lines**: 25  
 **Complexity**: 1
+
+**Exports**:
+- `analyzeCode`
+
+**Imports**:
+- `./analyzer.js`
+- `./types.js`
 
 ### `core/code-analyzer/cli.ts`
 
@@ -335,8 +435,8 @@ This documentation covers 25 files with 5,143 lines of code.
 ### `core/code-analyzer/analyzer.ts`
 
 **Language**: TypeScript  
-**Lines**: 525  
-**Complexity**: 49
+**Lines**: 563  
+**Complexity**: 50
 
 **Exports**:
 - `createAnalyzer`
@@ -348,7 +448,7 @@ This documentation covers 25 files with 5,143 lines of code.
 - `path`
 - `../../utils/logger.js`
 - `../../utils/errors.js`
-- ... and 2 more
+- ... and 3 more
 
 ### `core/bob-integration/types.ts`
 
@@ -362,11 +462,26 @@ This documentation covers 25 files with 5,143 lines of code.
 **Lines**: 11  
 **Complexity**: 1
 
+### `core/bob-integration/http-client.ts`
+
+**Language**: TypeScript  
+**Lines**: 271  
+**Complexity**: 18
+
+**Exports**:
+- `createHTTPClient`
+- `BobHTTPClient`
+
+**Imports**:
+- `../../utils/logger.js`
+- `../../utils/errors.js`
+- `./types.js`
+
 ### `core/bob-integration/client.ts`
 
 **Language**: TypeScript  
-**Lines**: 238  
-**Complexity**: 12
+**Lines**: 278  
+**Complexity**: 21
 
 **Exports**:
 - `createBobClient`
@@ -375,6 +490,7 @@ This documentation covers 25 files with 5,143 lines of code.
 **Imports**:
 - `../../utils/logger.js`
 - `../../utils/errors.js`
+- `./http-client.js`
 - `./types.js`
 
 
@@ -386,6 +502,22 @@ This documentation covers 25 files with 5,143 lines of code.
 
 **Location**: Line 13  
 **Complexity**: 3  
+**Exported**: Yes  
+**Async**: Yes
+
+### Functions in `utils/progress.ts`
+
+#### `export function createProgress()`
+
+**Location**: Line 255  
+**Complexity**: 1  
+**Exported**: Yes  
+**Async**: No
+
+#### `export async function withProgress()`
+
+**Location**: Line 262  
+**Complexity**: 2  
 **Exported**: Yes  
 **Async**: Yes
 
@@ -472,6 +604,24 @@ This documentation covers 25 files with 5,143 lines of code.
 **Exported**: Yes  
 **Async**: No
 
+### Functions in `watsonx/orchestrate/client.ts`
+
+#### `export function createOrchestrateClient()`
+
+**Location**: Line 511  
+**Complexity**: 1  
+**Exported**: Yes  
+**Async**: No
+
+### Functions in `watsonx/ai/client.ts`
+
+#### `export function createWatsonxAIClient()`
+
+**Location**: Line 473  
+**Complexity**: 1  
+**Exported**: Yes  
+**Async**: No
+
 ### Functions in `core/task-automator/cli.ts`
 
 #### `export async function runTaskAutomator()`
@@ -506,7 +656,7 @@ This documentation covers 25 files with 5,143 lines of code.
 
 #### `export function createTaskAutomator()`
 
-**Location**: Line 800  
+**Location**: Line 814  
 **Complexity**: 1  
 **Exported**: Yes  
 **Async**: No
@@ -515,7 +665,7 @@ This documentation covers 25 files with 5,143 lines of code.
 
 #### `export function createDocGenerator()`
 
-**Location**: Line 567  
+**Location**: Line 607  
 **Complexity**: 1  
 **Exported**: Yes  
 **Async**: No
@@ -545,6 +695,15 @@ This documentation covers 25 files with 5,143 lines of code.
 **Exported**: Yes  
 **Async**: No
 
+### Functions in `core/code-analyzer/index.ts`
+
+#### `export async function analyzeCode()`
+
+**Location**: Line 16  
+**Complexity**: 1  
+**Exported**: Yes  
+**Async**: Yes
+
 ### Functions in `core/code-analyzer/cli.ts`
 
 #### `export async function runCodeAnalyzer()`
@@ -565,7 +724,16 @@ This documentation covers 25 files with 5,143 lines of code.
 
 #### `export function createAnalyzer()`
 
-**Location**: Line 520  
+**Location**: Line 558  
+**Complexity**: 1  
+**Exported**: Yes  
+**Async**: No
+
+### Functions in `core/bob-integration/http-client.ts`
+
+#### `export function createHTTPClient()`
+
+**Location**: Line 266  
 **Complexity**: 1  
 **Exported**: Yes  
 **Async**: No
@@ -574,13 +742,22 @@ This documentation covers 25 files with 5,143 lines of code.
 
 #### `export function createBobClient()`
 
-**Location**: Line 233  
+**Location**: Line 273  
 **Complexity**: 1  
 **Exported**: Yes  
 **Async**: No
 
 
 ## Classes
+
+### Classes in `utils/progress.ts`
+
+#### `export class ProgressIndicator`
+
+**Location**: Line 42  
+**Exported**: Yes  
+**Methods**: 10  
+**Properties**: 5
 
 ### Classes in `utils/logger.ts`
 
@@ -700,11 +877,38 @@ This documentation covers 25 files with 5,143 lines of code.
 **Methods**: 0  
 **Properties**: 0
 
+### Classes in `server/index.ts`
+
+#### `export class DashboardServer`
+
+**Location**: Line 18  
+**Exported**: Yes  
+**Methods**: 13  
+**Properties**: 2
+
+### Classes in `watsonx/orchestrate/client.ts`
+
+#### `export class OrchestrateClient`
+
+**Location**: Line 23  
+**Exported**: Yes  
+**Methods**: 18  
+**Properties**: 2
+
+### Classes in `watsonx/ai/client.ts`
+
+#### `export class WatsonxAIClient`
+
+**Location**: Line 24  
+**Exported**: Yes  
+**Methods**: 19  
+**Properties**: 3
+
 ### Classes in `core/task-automator/automator.ts`
 
 #### `export class TaskAutomator`
 
-**Location**: Line 31  
+**Location**: Line 32  
 **Exported**: Yes  
 **Methods**: 17  
 **Properties**: 2
@@ -713,7 +917,7 @@ This documentation covers 25 files with 5,143 lines of code.
 
 #### `export class DocGenerator`
 
-**Location**: Line 20  
+**Location**: Line 21  
 **Exported**: Yes  
 **Methods**: 13  
 **Properties**: 1
@@ -731,10 +935,19 @@ This documentation covers 25 files with 5,143 lines of code.
 
 #### `export class CodeAnalyzer`
 
-**Location**: Line 25  
+**Location**: Line 26  
 **Exported**: Yes  
 **Methods**: 14  
 **Properties**: 1
+
+### Classes in `core/bob-integration/http-client.ts`
+
+#### `export class BobHTTPClient`
+
+**Location**: Line 51  
+**Exported**: Yes  
+**Methods**: 6  
+**Properties**: 3
 
 ### Classes in `core/bob-integration/client.ts`
 
@@ -743,19 +956,22 @@ This documentation covers 25 files with 5,143 lines of code.
 **Location**: Line 22  
 **Exported**: Yes  
 **Methods**: 11  
-**Properties**: 3
+**Properties**: 5
 
 
 ## Dependencies
 
 ### Dependency Graph
 
-Total dependencies: 58
+Total dependencies: 82
 
 **`index.ts`** imports:
 - `./utils/logger.js`
 - `./utils/config.js`
 - `./core/bob-integration/index.js`
+
+**`utils/progress.ts`** imports:
+- `chalk`
 
 **`utils/logger.ts`** imports:
 - `chalk`
@@ -770,6 +986,16 @@ Total dependencies: 58
 **`types/index.ts`** imports:
 - `zod`
 
+**`server/index.ts`** imports:
+- `express`
+- `cors`
+- `path`
+- `url`
+- `../utils/logger.js`
+- `../utils/config.js`
+- `../core/bob-integration/index.js`
+- `../core/code-analyzer/index.js`
+
 **`cli/index.ts`** imports:
 - `commander`
 - `chalk`
@@ -777,6 +1003,16 @@ Total dependencies: 58
 - `../core/doc-generator/cli.js`
 - `../core/task-automator/cli.js`
 - `../core/task-automator/types.js`
+
+**`watsonx/orchestrate/client.ts`** imports:
+- `../../utils/logger.js`
+- `../../utils/errors.js`
+- `./types.js`
+
+**`watsonx/ai/client.ts`** imports:
+- `../../utils/logger.js`
+- `../../utils/errors.js`
+- `./types.js`
 
 **`core/task-automator/cli.ts`** imports:
 - `chalk`
@@ -792,6 +1028,7 @@ Total dependencies: 58
 - `crypto`
 - `../../utils/logger.js`
 - `../../utils/errors.js`
+- `../../utils/progress.js`
 - `../bob-integration/client.js`
 - `../code-analyzer/index.js`
 - `../doc-generator/index.js`
@@ -803,6 +1040,7 @@ Total dependencies: 58
 - `path`
 - `../../utils/logger.js`
 - `../../utils/errors.js`
+- `../../utils/progress.js`
 - `../code-analyzer/index.js`
 - `./types.js`
 - `../code-analyzer/types.js`
@@ -821,6 +1059,10 @@ Total dependencies: 58
 - `../../utils/logger.js`
 - `./types.js`
 
+**`core/code-analyzer/index.ts`** imports:
+- `./analyzer.js`
+- `./types.js`
+
 **`core/code-analyzer/cli.ts`** imports:
 - `./analyzer.js`
 - `../../utils/logger.js`
@@ -832,12 +1074,19 @@ Total dependencies: 58
 - `path`
 - `../../utils/logger.js`
 - `../../utils/errors.js`
+- `../../utils/progress.js`
 - `./ts-parser.js`
+- `./types.js`
+
+**`core/bob-integration/http-client.ts`** imports:
+- `../../utils/logger.js`
+- `../../utils/errors.js`
 - `./types.js`
 
 **`core/bob-integration/client.ts`** imports:
 - `../../utils/logger.js`
 - `../../utils/errors.js`
+- `./http-client.js`
 - `./types.js`
 
 
@@ -845,16 +1094,16 @@ Total dependencies: 58
 
 ### Complexity
 
-- **Average**: 14.92
+- **Average**: 15.29
 - **Maximum**: 80
 - **Minimum**: 0
 
 ### Maintainability
 
-- **Index**: 64.37
+- **Index**: 62.98
 - **Score**: B
-- **Complexity Factor**: 14.92
-- **Volume**: 63404.93
+- **Complexity Factor**: 15.29
+- **Volume**: 98422.02
 
 ### Quality
 

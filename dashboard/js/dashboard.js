@@ -577,49 +577,34 @@ async function generateReport() {
     showToast('Generating report...', 'info');
     
     try {
-        // Simulate report generation with mock data
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Call the API to generate report
+        const response = await api.request('/reports/generate', {
+            method: 'POST',
+            body: JSON.stringify({
+                type,
+                options: {
+                    includeCharts: true,
+                    includeHistory: true
+                }
+            })
+        });
         
-        // Use current state data for report
-        const report = {
-            type,
-            timestamp: new Date().toISOString(),
-            stats: {
-                files: state.stats.files,
-                lines: state.stats.lines,
-                functions: state.stats.functions,
-                classes: state.stats.classes,
-                issues: state.stats.issues
-            },
-            bobUsage: {
-                used: state.bobUsage.used,
-                remaining: state.bobUsage.remaining,
-                total: state.bobUsage.total
-            },
-            workflows: state.workflows,
-            analysis: state.analysis,
-            summary: {
-                totalFiles: state.stats.files,
-                totalLines: state.stats.lines,
-                bobcoinsUsed: state.bobUsage.used,
-                workflowsRun: state.workflows.length,
-                issuesFound: state.stats.issues,
-                reportType: type
-            }
-        };
-        
-        // Download as JSON
-        const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `lazybob-report-${type}-${Date.now()}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showToast('Report generated and downloaded successfully!', 'success');
+        if (response.success && response.report) {
+            // Download the report as JSON
+            const blob = new Blob([JSON.stringify(response.report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lazybob-report-${type}-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Report generated and downloaded successfully!', 'success');
+        } else {
+            throw new Error('Failed to generate report');
+        }
     } catch (error) {
         console.error('Report generation error:', error);
         showToast('Failed to generate report: ' + error.message, 'error');
